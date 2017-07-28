@@ -37,13 +37,15 @@ def main():
 	offsets = [index + 0.1 for index in range(len(data))]
 	if not linegraph:
 		pyplot.xticks(offsets, indeps, rotation = -45, horizontalalignment = 'left')
-	if not linegraph and logscale:
-		pyplot.ylim(10 ** 0, 10 ** 5)
 	if linegraph:
 		for index in range(len(series[0])):
 			pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None)
 	else:
 		pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
+	if not linegraph and logscale:
+		pyplot.ylim(10 ** 0, 10 ** 5)
+	else:
+		pyplot.ylim(0)
 	pyplot.title(title)
 	pyplot.xlabel(xlabel)
 	if len(slabels) == 1:
