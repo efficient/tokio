@@ -35,18 +35,21 @@ def main():
 		series = [[float(each[col]) for col in range(0, len(each), 2)] for each in series]
 
 	offsets = [index + 0.1 for index in range(len(data))]
-	# TODO: Remove these list comprehensions when adding support for multiple series:
-	pyplot.title(title)
-	pyplot.xlabel(xlabel)
-	pyplot.ylabel(*slabels)
 	if not linegraph:
 		pyplot.xticks(offsets, indeps, rotation = -45, horizontalalignment = 'left')
 	if not linegraph and logscale:
 		pyplot.ylim(10 ** 0, 10 ** 5)
 	if linegraph:
-		pyplot.errorbar(indeps, [row[0] for row in series], yerr = [row[0] for row in errors] if errorbars else None)
+		for index in range(len(series[0])):
+			pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None)
 	else:
 		pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
+	pyplot.title(title)
+	pyplot.xlabel(xlabel)
+	if len(slabels) == 1:
+		pyplot.ylabel(*slabels)
+	else:
+		pyplot.legend(slabels)
 
 	pyplot.savefig(args.dest, bbox_inches = 'tight')
 
