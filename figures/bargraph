@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from argparse import ArgumentParser
+from itertools import cycle
 from matplotlib import pyplot
 from os.path import basename
 from sys import argv, stdin
@@ -27,9 +28,15 @@ def main():
 	xlabel = labels[0]
 	ylabel = title[1] if len(title) > 1 else ''
 	slabels = [labels[col] for col in range(1, len(labels), 2)] if errorbars else labels[1:]
+	props = {}
 	data = []
 	for line in stdin:
-		data += [line.strip().split(',')]
+		line = line.strip().split(',')
+		if line[0][:2] == '--':
+			props[line[0][2:]] = cycle(line[1:])
+			pass
+		else:
+			data.append(line)
 	if linegraph:
 		indeps = [float(each[0]) for each in data]
 	else:
@@ -42,11 +49,18 @@ def main():
 	offsets = [index + 0.1 for index in range(len(data))]
 	if not linegraph:
 		pyplot.xticks(offsets, indeps, rotation = -45, horizontalalignment = 'left')
+
+	rendered_series = []
 	if linegraph:
 		for index in range(len(series[0])):
-			pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-')
+			rendered_series.append(pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-')[0])
 	else:
-		pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
+		rendered_series = pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
+
+	for rs in rendered_series:
+		for prop in props:
+			getattr(rs, prop)(next(props[prop]))
+
 	if not linegraph and logscale:
 		pyplot.ylim(10 ** 0, 10 ** 5)
 	else:
