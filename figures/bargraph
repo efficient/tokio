@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from itertools import cycle
 from matplotlib import pyplot
 from os.path import basename
@@ -9,7 +9,11 @@ from sys import argv, stdin
 def main():
 	linegraph = basename(argv[0]) == 'linegraph'
 
-	parser = ArgumentParser()
+	url_of_sandwich = 'file:///usr/share/doc/python-matplotlib-doc/html/api/patches_api.html#matplotlib.patches.Patch.set_aa'
+	if linegraph:
+		url_of_sandwich = 'file:///usr/share/doc/python-matplotlib-doc/html/api/lines_api.html#matplotlib.lines.Line2D.set_aa'
+
+	parser = ArgumentParser(epilog = 'Each line beginning with \'--\' invokes a function listed at:\n\t' + url_of_sandwich + '\non each series, cycling through the rest of the comma-separated line for the arguments.', formatter_class = RawDescriptionHelpFormatter)
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
 	if not linegraph:
 		parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
