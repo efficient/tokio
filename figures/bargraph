@@ -12,11 +12,15 @@ def main():
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
 	if not linegraph:
 		parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
+	if linegraph:
+		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
 	parser.add_argument('dest', help = 'Destination filename')
 	args = parser.parse_args()
 	errorbars = args.e
 	if not linegraph:
 		logscale = args.l
+	if linegraph:
+		scatter = args.s
 
 	title = input().strip()
 	labels = input().strip().split(',')
@@ -39,7 +43,7 @@ def main():
 		pyplot.xticks(offsets, indeps, rotation = -45, horizontalalignment = 'left')
 	if linegraph:
 		for index in range(len(series[0])):
-			pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.')
+			pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-')
 	else:
 		pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
 	if not linegraph and logscale:
