@@ -15,15 +15,13 @@ def main():
 
 	parser = ArgumentParser(epilog = 'Each line beginning with \'--\' invokes a function listed at:\n\t' + url_of_sandwich + '\non each series, cycling through the rest of the comma-separated line for the arguments.', formatter_class = RawDescriptionHelpFormatter)
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
-	if not linegraph:
-		parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
+	parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
 	if linegraph:
 		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
 	parser.add_argument('dest', help = 'Destination filename')
 	args = parser.parse_args()
 	errorbars = args.e
-	if not linegraph:
-		logscale = args.l
+	logscale = args.l
 	if linegraph:
 		scatter = args.s
 
@@ -58,6 +56,8 @@ def main():
 	if linegraph:
 		for index in range(len(series[0])):
 			rendered_series.append(pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-')[0])
+			if logscale:
+				pyplot.yscale('log')
 	else:
 		rendered_series = pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
 
