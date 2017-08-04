@@ -17,12 +17,14 @@ def main():
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
 	parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
 	if linegraph:
+		parser.add_argument('-o', action = 'store_true', help = 'Use *horizontal* log scale')
 		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
 	parser.add_argument('dest', help = 'Destination filename')
 	args = parser.parse_args()
 	errorbars = args.e
 	logscale = args.l
 	if linegraph:
+		hlogscale = args.o
 		scatter = args.s
 
 	title = input().strip().split(',')
@@ -58,6 +60,8 @@ def main():
 			rendered_series.append(pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-')[0])
 			if logscale:
 				pyplot.yscale('log')
+			if hlogscale:
+				pyplot.xscale('log')
 	else:
 		rendered_series = pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
 
