@@ -57,7 +57,7 @@ def main():
 	rendered_series = []
 	if linegraph:
 		for index in range(len(series[0])):
-			rendered_series.append(pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-')[0])
+			rendered_series.append(pyplot.errorbar(indeps, [row[index] for row in series], yerr = [row[index] for row in errors] if errorbars else None, marker = '.', linestyle = '' if scatter else '-', capsize = 2)[0])
 			if logscale:
 				pyplot.yscale('log')
 			if hlogscale:
