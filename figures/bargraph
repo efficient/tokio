@@ -16,6 +16,7 @@ def main():
 	parser = ArgumentParser(epilog = 'Each line beginning with \'--\' invokes a function listed at:\n\t' + url_of_sandwich + '\non each series, cycling through the rest of the comma-separated line for the arguments.', formatter_class = RawDescriptionHelpFormatter)
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
 	parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
+	parser.add_argument('-y', type = float, default = 0.0, help = 'Custom y max')
 	if linegraph:
 		parser.add_argument('-o', action = 'store_true', help = 'Use *horizontal* log scale')
 		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
@@ -23,6 +24,7 @@ def main():
 	args = parser.parse_args()
 	errorbars = args.e
 	logscale = args.l
+	ymax = args.y
 	if linegraph:
 		hlogscale = args.o
 		scatter = args.s
@@ -70,7 +72,9 @@ def main():
 			getattr(rs, prop)(next(props[prop]))
 
 	if not linegraph and logscale:
-		pyplot.ylim(10 ** 0, 10 ** 5)
+		pyplot.ylim(10 ** 0, ymax)
+	elif ymax:
+		pyplot.ylim(0, ymax)
 	else:
 		pyplot.ylim(0)
 	pyplot.title(title[0])
