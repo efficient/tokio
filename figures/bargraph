@@ -17,6 +17,7 @@ def main():
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
 	parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
 	parser.add_argument('-y', type = float, default = 0.0, help = 'Custom y max')
+	parser.add_argument('-v', action = 'store_true', help = 'Position legend to the right of the graph area')
 	if linegraph:
 		parser.add_argument('-o', action = 'store_true', help = 'Use *horizontal* log scale')
 		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
@@ -25,6 +26,7 @@ def main():
 	errorbars = args.e
 	logscale = args.l
 	ymax = args.y
+	vertlegend = args.v
 	if linegraph:
 		hlogscale = args.o
 		scatter = args.s
@@ -82,6 +84,8 @@ def main():
 	pyplot.ylabel(ylabel)
 	if len(slabels) == 1:
 		pyplot.ylabel(*slabels)
+	elif vertlegend:
+		pyplot.legend(slabels, loc = 'center left', bbox_to_anchor = (1.0, 0.5))
 	else:
 		pyplot.legend(slabels)
 
