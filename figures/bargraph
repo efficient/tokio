@@ -73,6 +73,7 @@ def main():
 		for prop in props:
 			getattr(rs, prop)(next(props[prop]))
 
+	pyplot.xlim(0 if linegraph else -0.5)
 	if not linegraph and logscale:
 		pyplot.ylim(10 ** 0, ymax)
 	elif ymax:
