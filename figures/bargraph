@@ -21,6 +21,8 @@ def main():
 	if linegraph:
 		parser.add_argument('-o', action = 'store_true', help = 'Use *horizontal* log scale')
 		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
+	else:
+		parser.add_argument('-i', type = int, default = 1, help = 'Visible label increment (for skipping some)')
 	parser.add_argument('dest', help = 'Destination filename')
 	args = parser.parse_args()
 	errorbars = args.e
@@ -30,6 +32,8 @@ def main():
 	if linegraph:
 		hlogscale = args.o
 		scatter = args.s
+	else:
+		increment = args.i
 
 	title = input().strip().split(',')
 	labels = input().strip().split(',')
@@ -48,7 +52,7 @@ def main():
 	if linegraph:
 		indeps = [float(each[0]) for each in data]
 	else:
-		indeps = [each[0] for each in data]
+		indeps = [data[each][0] if not each % increment else '' for each in range(len(data))]
 	series = [[float(col) for col in each[1:]] for each in data]
 	errors = [[float(each[index]) for index in range(1, len(each), 2)] for each in series]
 	if errorbars:
