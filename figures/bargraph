@@ -23,6 +23,7 @@ def main():
 		parser.add_argument('-s', action = 'store_true', help = 'Draw a scatterplot instead of a linegraph')
 	else:
 		parser.add_argument('-i', type = int, default = 1, help = 'Visible label increment (for skipping some)')
+		parser.add_argument('-r', type = float, default = 0.0, help = 'Label rotation')
 	parser.add_argument('dest', help = 'Destination filename')
 	args = parser.parse_args()
 	errorbars = args.e
@@ -34,6 +35,7 @@ def main():
 		scatter = args.s
 	else:
 		increment = args.i
+		rotation = args.r
 
 	title = input().strip().split(',')
 	labels = input().strip().split(',')
@@ -60,7 +62,7 @@ def main():
 
 	offsets = [index + 0.1 for index in range(len(data))]
 	if not linegraph:
-		pyplot.xticks(offsets, indeps, rotation = -45, horizontalalignment = 'left')
+		pyplot.xticks(offsets, indeps, rotation = rotation, horizontalalignment = 'left' if rotation else 'center')
 
 	rendered_series = []
 	if linegraph:
