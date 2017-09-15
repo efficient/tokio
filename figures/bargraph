@@ -16,6 +16,8 @@ def main():
 	parser = ArgumentParser(epilog = 'Each line beginning with \'--\' invokes a function listed at:\n\t' + url_of_sandwich + '\non each series, cycling through the rest of the comma-separated line for the arguments.', formatter_class = RawDescriptionHelpFormatter)
 	parser.add_argument('-e', action = 'store_true', help = 'Draw error bars using alternate columns')
 	parser.add_argument('-l', action = 'store_true', help = 'Use log scale')
+	if linegraph:
+		parser.add_argument('-x', type = float, default = 0.0, help = 'Custom x max')
 	parser.add_argument('-y', type = float, default = 0.0, help = 'Custom y max')
 	parser.add_argument('-v', action = 'store_true', help = 'Position legend to the right of the graph area')
 	if linegraph:
@@ -31,6 +33,7 @@ def main():
 	ymax = args.y
 	vertlegend = args.v
 	if linegraph:
+		xmax = args.x
 		hlogscale = args.o
 		scatter = args.s
 	else:
@@ -79,13 +82,18 @@ def main():
 		for prop in props:
 			getattr(rs, prop)(next(props[prop]))
 
-	pyplot.xlim(0 if linegraph else -0.5)
+	if xmax:
+		pyplot.xlim(0 if linegraph else -0.5, xmax)
+	else:
+		pyplot.xlim(0 if linegraph else -0.5)
+
 	if not linegraph and logscale:
 		pyplot.ylim(10 ** 0, ymax)
 	elif ymax:
 		pyplot.ylim(0, ymax)
 	else:
 		pyplot.ylim(0)
+
 	pyplot.title(title[0])
 	pyplot.xlabel(xlabel)
 	pyplot.ylabel(ylabel)
