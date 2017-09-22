@@ -77,7 +77,8 @@ def main():
 			if hlogscale:
 				pyplot.xscale('log')
 	else:
-		rendered_series = pyplot.bar(offsets, [row[0] for row in series], log = logscale, yerr = [row[0] for row in errors] if errorbars else None)
+		for index in range(len(series[0])):
+			rendered_series.append(pyplot.bar([each + index * 0.9 / len(series[0]) for each in offsets], [row[index] for row in series], 0.9 / len(series[0]), log = logscale, yerr = [row[0] for row in errors] if errorbars else None))
 
 	for rs in rendered_series:
 		for prop in props:
