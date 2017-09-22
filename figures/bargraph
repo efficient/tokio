@@ -32,6 +32,7 @@ def main():
 	logscale = args.l
 	ymax = args.y
 	vertlegend = args.v
+	xmax = 0
 	if linegraph:
 		xmax = args.x
 		hlogscale = args.o
