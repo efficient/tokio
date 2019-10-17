@@ -1,0 +1,3 @@
+[submodule "tokio"]
+	path = tokio
+	url = ../tokio

@@ -1,0 +1,10 @@
+[package]
+name = "hype"
+version = "0.0.0"
+edition = "2018"
+
+[dependencies]
+hyper = "0.12.35"
+
+[patch.crates-io.tokio-threadpool]
+path = "tokio/tokio-threadpool"
