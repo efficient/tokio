@@ -20,6 +20,9 @@ A task scheduler backed by a work-stealing thread pool.
 keywords = ["futures", "tokio"]
 categories = ["concurrency", "asynchronous"]
 
+[features]
+preemptive = ["inger"]
+
 [dependencies]
 tokio-executor = "0.1.8"
 futures = "0.1.19"
@@ -30,6 +33,10 @@ num_cpus = "1.2"
 slab = "0.4.1"
 log = "0.4"
 lazy_static = "1"
+
+[dependencies.inger]
+path = "../../inger"
+optional = true
 
 [dev-dependencies]
 rand = "0.7"

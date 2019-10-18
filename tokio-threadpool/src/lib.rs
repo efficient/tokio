@@ -92,6 +92,9 @@ extern crate slab;
 #[macro_use]
 extern crate log;
 
+#[cfg(feature = "preemptive")]
+extern crate inger;
+
 // ## Crate layout
 //
 // The primary type, `Pool`, holds the majority of a thread pool's state,
