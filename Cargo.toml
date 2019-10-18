@@ -3,8 +3,12 @@ name = "hype"
 version = "0.0.0"
 edition = "2018"
 
+[features]
+preemptive = ["tokio-threadpool/preemptive"]
+
 [dependencies]
 hyper = "0.12.35"
+tokio-threadpool = "*"
 
 [patch.crates-io.tokio-threadpool]
 path = "tokio/tokio-threadpool"
