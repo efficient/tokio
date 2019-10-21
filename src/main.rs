@@ -11,6 +11,7 @@ use hyper::Request;
 use hyper::Response;
 use hyper::Server;
 use hyper::StatusCode;
+use pretty_env_logger::init;
 
 fn main() {
 	let addr = "0.0.0.0:1337".parse().unwrap();
@@ -20,6 +21,7 @@ fn main() {
 	;
 
 	println!("Listening on http://{}", addr);
+	init();
 	run(server);
 }
 
