@@ -9,6 +9,7 @@ use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::*;
 use std::sync::Arc;
 
+#[ignore]
 #[test]
 fn hammer() {
     use futures::future;

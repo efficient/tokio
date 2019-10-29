@@ -291,6 +291,7 @@ fn blocking_one_time_gets_capacity_for_multiple_blocks() {
     }
 }
 
+#[ignore]
 #[test]
 fn shutdown() {
     const ITER: usize = 1_000;
@@ -357,6 +358,7 @@ enum Sleep {
     Fixed(Duration),
 }
 
+#[ignore]
 #[test]
 fn hammer() {
     use self::Sleep::*;

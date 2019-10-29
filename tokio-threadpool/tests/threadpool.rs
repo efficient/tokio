@@ -24,6 +24,7 @@ fn ignore_results<F: Future + Send + 'static>(
     Box::new(f.map(|_| ()).map_err(|_| ()))
 }
 
+#[ignore]
 #[test]
 fn natural_shutdown_simple_futures() {
     let _ = ::env_logger::try_init();
@@ -211,6 +212,7 @@ fn drop_threadpool_drops_futures() {
     }
 }
 
+#[ignore]
 #[test]
 fn many_oneshot_futures() {
     const NUM: usize = 10_000;
@@ -239,6 +241,7 @@ fn many_oneshot_futures() {
     }
 }
 
+#[ignore]
 #[test]
 fn many_multishot_futures() {
     use futures::sync::mpsc;
@@ -374,6 +377,7 @@ fn busy_threadpool_is_not_idle() {
     idle.wait().unwrap();
 }
 
+#[ignore]
 #[test]
 fn panic_in_task() {
     let pool = ThreadPool::new();
@@ -444,6 +448,7 @@ fn multi_threadpool() {
     done_rx.recv().unwrap();
 }
 
+#[ignore]
 #[test]
 fn eagerly_drops_futures() {
     use futures::future::{empty, lazy, Future};
