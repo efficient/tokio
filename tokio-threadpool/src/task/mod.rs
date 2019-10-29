@@ -18,6 +18,10 @@ use std::sync::atomic::{AtomicPtr, AtomicUsize};
 use std::sync::Arc;
 use std::{fmt, panic, ptr};
 
+/// Preemption quantum, in microseconds.
+#[cfg(feature = "preemptive")]
+const QUANTUM: u64 = u64::max_value();
+
 /// Harness around a future.
 ///
 /// This also behaves as a node in the inbound work queue and the blocking
@@ -67,6 +71,8 @@ type BoxFuture = Box<dyn Future<Item = (), Error = ()> + Send + 'static>;
 impl Task {
     /// Create a new `Task` as a harness for `future`.
     pub fn new(future: BoxFuture) -> Task {
+        let future = make_preemptible(future);
+
         // Wrap the future with an execution context.
         let task_fut = executor::spawn(future);
 
@@ -305,4 +311,35 @@ impl fmt::Debug for Task {
             .field("future", &"Spawn<BoxFuture>")
             .finish()
     }
+}
+
+#[cfg(not(feature = "preemptive"))]
+#[inline]
+fn make_preemptible(future: BoxFuture) -> BoxFuture {
+    future
+}
+
+#[cfg(feature = "preemptive")]
+fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
+    use futures_util::try_future::TryFutureExt;
+    use inger::future::poll_fn;
+    use std::task::Poll;
+
+    let future = poll_fn(
+        move ||
+            future.poll().map(|async|
+                if let Async::Ready(async) = async {
+                    Poll::Ready(Ok(async))
+                } else {
+                    Poll::Pending
+                }
+            ).unwrap_or_else(|or| {
+                error!("BoxFuture::poll()");
+                Poll::Ready(Err(or))
+            }),
+        QUANTUM,
+    ).expect("poll_fn() [launch()]");
+    Box::new(future.compat().map(drop).map_err(|or|
+        error!("PreemptiveFuture::poll() [resume()]: {}", or)
+    ))
 }

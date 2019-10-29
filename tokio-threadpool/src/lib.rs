@@ -93,6 +93,9 @@ extern crate slab;
 extern crate log;
 
 #[cfg(feature = "preemptive")]
+extern crate futures_util;
+
+#[cfg(feature = "preemptive")]
 extern crate inger;
 
 // ## Crate layout
