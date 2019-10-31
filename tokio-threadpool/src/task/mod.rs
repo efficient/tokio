@@ -18,9 +18,9 @@ use std::sync::atomic::{AtomicPtr, AtomicUsize};
 use std::sync::Arc;
 use std::{fmt, panic, ptr};
 
-/// Preemption quantum, in microseconds.
+/// Execution time limit for preemption, in microseconds.
 #[cfg(feature = "preemptive")]
-const QUANTUM: u64 = u64::max_value();
+const TIME_LIMIT: u64 = u64::max_value();
 
 /// Harness around a future.
 ///
@@ -337,7 +337,7 @@ fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
                 error!("BoxFuture::poll()");
                 Poll::Ready(Err(or))
             }),
-        QUANTUM,
+        TIME_LIMIT,
     ).expect("poll_fn() [launch()]");
     Box::new(future.compat().map(drop).map_err(|or|
         error!("PreemptiveFuture::poll() [resume()]: {}", or)
