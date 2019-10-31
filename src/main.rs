@@ -12,10 +12,14 @@ use hyper::Response;
 use hyper::Server;
 use hyper::StatusCode;
 use pretty_env_logger::init;
+use std::borrow::Cow;
+use std::env::args;
 
 fn main() {
-	let addr = "0.0.0.0:1337".parse().unwrap();
-	let server = Server::bind(&addr)
+	let addr: Cow<_> = args().skip(1).next()
+		.map(|port| format!("0.0.0.0:{}", port).into())
+		.unwrap_or("0.0.0.0:1337".into());
+	let server = Server::bind(&addr.parse().unwrap())
 		.serve(|| service_fn_ok(callback))
 		.map_err(|e| eprintln!("server error: {}", e))
 	;
