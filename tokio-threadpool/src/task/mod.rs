@@ -20,7 +20,7 @@ use std::{fmt, panic, ptr};
 
 /// Execution time limit for preemption, in microseconds.
 #[cfg(feature = "preemptive")]
-const TIME_LIMIT: u64 = u64::max_value();
+const TIME_LIMIT: u64 = 100;
 
 /// Harness around a future.
 ///
