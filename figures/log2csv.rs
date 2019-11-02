@@ -201,17 +201,8 @@ fn args() -> Result<Args, Cow<'static, str>> {
 	if let Some(Err(or)) = files.iter().find(|error| error.is_err()) {
 		Err(or.clone())?;
 	}
-	let mut files: Vec<_> = files.into_iter().map(|file| file.unwrap()).collect();
-	for file in files.iter() {
-		if series.clone().find(|series| *series == file.series()).is_none() {
-			Err(format!(
-				"-s: list missing '{}' entry required by file '{}'",
-				file.series(),
-				file.name,
-			))?;
-		}
-	}
 
+	let mut files: Vec<_> = files.into_iter().map(|file| file.unwrap()).collect();
 	let mut series: Vec<_> = series.zip(labels).map(|(series, name)| Series {
 		name: name.to_owned(),
 		files: files.drain_filter(|file| file.series() == series).collect(),
