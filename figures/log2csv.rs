@@ -114,12 +114,16 @@ impl File {
 		Ok(this)
 	}
 
+	fn basename(&self) -> &str {
+		self.name.split('/').last().unwrap_or(&self.name)
+	}
+
 	fn series(&self) -> &str {
 		Self::try_series(&self.name).unwrap()
 	}
 
 	fn x(&self) -> &str {
-		self.name.split(Self::DELIM).next().unwrap()
+		self.basename().split(Self::DELIM).next().unwrap()
 	}
 
 	fn x_num(&self) -> usize {
