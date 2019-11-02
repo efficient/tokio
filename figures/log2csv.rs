@@ -13,7 +13,7 @@ fn main() -> Result<(), Cow<'static, str>> {
 	let script: Option<_> = args.script.as_ref().map(|script| &script[..]);
 	for index in 0..args.series[0].files.len() {
 		let x = args.series[0].files[index].x_num();
-		print!("{}", transform(x));
+		print!("{}", transform_x(x));
 		for file in args.series.iter().map(|series| &series.files[index]) {
 			debug_assert!(file.x_num() == x);
 			print!(",{}", mean(&file, script)?);
@@ -24,7 +24,7 @@ fn main() -> Result<(), Cow<'static, str>> {
 	Ok(())
 }
 
-fn transform(x: usize) -> usize {
+fn transform_x(x: usize) -> usize {
 	use std::mem::transmute;
 	extern "C" {
 		#[linkage = "extern_weak"]
@@ -37,6 +37,23 @@ fn transform(x: usize) -> usize {
 		} else {
 			let transform: extern "C" fn(usize) -> usize = transmute(transform_x);
 			transform(x)
+		}
+	}
+}
+
+fn transform_y(y: &str) -> f64 {
+	use std::mem::transmute;
+	extern "C" {
+		#[linkage = "extern_weak"]
+		static transform_y: *const usize;
+	}
+
+	unsafe {
+		if transform_y.is_null() {
+			y.parse().expect("did you mean to use a y-transform plugin?")
+		} else {
+			let transform: extern "C" fn(&str) -> f64 = transmute(transform_y);
+			transform(y)
 		}
 	}
 }
@@ -70,10 +87,7 @@ fn mean(file: &File, script: Option<&str>) -> Result<f64, String> {
 		)?;
 	}
 
-	let numer: f64 = lines.lines().map(|line| {
-		let line: f64 = line.parse().unwrap();
-		line
-	}).sum();
+	let numer: f64 = lines.lines().map(transform_y).sum();
 	let denom: f64 = lines.lines().count() as _;
 
 	Ok(numer / denom)
