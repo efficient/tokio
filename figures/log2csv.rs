@@ -216,15 +216,6 @@ fn args() -> Result<Args, Cow<'static, str>> {
 		series.files.sort_unstable_by_key(|file| file.x_num());
 	}
 
-	let mut xes: Vec<_> = series.iter().map(|series|
-		series.files.iter().map(|file| file.x())
-	).collect();
-	xes.dedup_by(|a, b| a.eq(b));
-	if xes.len() != 1 {
-		Err("<filenames>...: not all data series contain the same set of x coordinates")?;
-	}
-	assert!(xes.len() == 1);
-
 	Ok(Args {
 		title: title.into_owned(),
 		x_label: x_label.into_owned(),
