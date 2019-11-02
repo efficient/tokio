@@ -1,0 +1,76 @@
+#!/bin/sh
+
+readonly HELPER="client_bimodal"
+readonly NCLIENTCORES="14" # client
+readonly MSERVERCORES="0xaaaaaaaa" # server
+
+if [ "$#" -ne "1" ]
+then
+	echo "USAGE: $0 <dest dir>"
+	exit 1
+fi
+
+set -eu
+dir="$1" # where to store
+
+start() {
+	taskset "$MSERVERCORES" cargo run --release "$@" &
+	await 1337
+}
+
+stop() {
+	kill "`ps -opid -Chype | tail -n1`" && sleep 2
+}
+
+baseline() {
+	set -ex
+	start >&2
+	ssh client "wrk/$HELPER" baseline "$@"
+}
+
+preempt() {
+	set -ex
+	export LIBGOTCHA_NOGLOBALS=
+	start --features preemptive >&2
+	ssh client "wrk/$HELPER" preempt "$@"
+}
+
+await() {
+	set +x
+	local port="$1"
+	while ! fuser "$port/tcp" >/dev/null 2>&1
+	do
+		:
+	done
+}
+
+mkdir "$dir"
+./version >"$dir/VERSION"
+
+unset SSH_AUTH_SOCK
+if [ "`ssh client md5sum "wrk/$HELPER" | cut -d" " -f1`" != "`md5sum "$HELPER" | cut -d" " -f1`" ]
+then
+	scp "$HELPER" "client:wrk"
+fi
+
+stop 2>/dev/null || true
+
+for indep in `seq 0 "$((NCLIENTCORES / 3))"`
+do
+	echo "==> INDEP: $indep long-request cores <=="
+	for series in baseline preempt
+	do
+		echo "   --> SERIES: $series server <--"
+		until
+			for file in `"$series" "$indep" "$NCLIENTCORES" "$dir"`
+			do
+				rsync --remove-source-files "client:wrk/$file" "$dir"
+			done
+			stop
+		do
+			:
+		done
+	done
+done 2>&1 | tee "$dir/LOG"
+
+echo "SUCCESS!  Results are in $dir/"

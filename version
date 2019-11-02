@@ -1,0 +1,42 @@
+#!/bin/sh
+
+run() {
+	printf $
+	printf " %s" "$@"
+	echo
+	"$@"
+}
+
+git() {
+	"`which git`" -c status.submodulesummary "$@"
+}
+
+cc() {
+	oneline "`which cc`" "$@"
+}
+
+ld() {
+	oneline "`which ld`" "$@"
+}
+
+ldd() {
+	oneline "$(dirname "$(readlink -f inger/ld.so)")/ldd" "$@"
+}
+
+oneline() {
+	"$@" | head -n1
+}
+
+run git log --oneline --no-decorate -1
+run uname -a
+run rustc --version
+run cc --version
+run ld --version
+run ldd --version
+
+run git status -uno
+run git diff --cached
+run git diff
+run git submodule foreach --recursive git status -uno
+run git submodule foreach --recursive git diff --cached
+run git submodule foreach --recursive git diff

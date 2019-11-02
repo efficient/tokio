@@ -1,0 +1,34 @@
+#!/bin/sh
+
+readonly  LONG="1000000"
+readonly SHORT="0010000"
+
+set -eu
+series="$1" # server part
+indep="$2" # num cores making long requests
+const="$3" # total num cores
+name="$4" # experiment name
+
+coregroup() {
+	local start="$1"
+	local count="$2"
+	local url="$3"
+	for core in `seq "$start" 2 "$((count * 2 - 1))"`
+	do
+		taskset -c "$core" ./wrk --latency -t 1 "$url" &
+	done
+}
+
+logfile() {
+	local half="$1"
+	echo "${indep}_${series}${half}_$name$const.log"
+}
+
+cd "`dirname "$0"`"
+
+coregroup 0 "$indep" "http://192.168.0.1:1337/$LONG" >"`logfile Long`" 2>&1
+coregroup "$indep" "$const" "http://192.168.0.1:1337/$SHORT" >"`logfile Short`" 2>&1
+wait
+
+logfile Long
+logfile Short
