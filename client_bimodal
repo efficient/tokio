@@ -27,7 +27,7 @@ logfile() {
 cd "`dirname "$0"`"
 
 coregroup 0 "$indep" "http://192.168.0.1:1337/$LONG" >"`logfile Long`" 2>&1
-coregroup "$indep" "$const" "http://192.168.0.1:1337/$SHORT" >"`logfile Short`" 2>&1
+coregroup "$((indep * 2))" "$const" "http://192.168.0.1:1337/$SHORT" >"`logfile Short`" 2>&1
 wait
 
 logfile Long
