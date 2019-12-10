@@ -1,9 +1,9 @@
 #!/bin/sh
 
-percentile="90"
-if [ "$#" -ge "2" ]
+if [ "$#" -lt "2" ]
 then
-	percentile="$2"
+	echo "USAGE: $0 <directory> <percentile> []"
+	exit 1
 fi
 
 class="Short"
@@ -12,4 +12,17 @@ then
 	class="Long"
 fi
 
-LD_PRELOAD=figures/libsi_us.so figures/log2csv -s "baseline$class,preempt$class" -n "s|.*$percentile%\s\+||p" "$1"/*.log | figures/linegraph graph.png
+percentile="$2"
+filename="$1_$percentile"
+if [ "$class" != "Short" ]
+then
+	filename="$filename-$class"
+fi
+filename="$filename.csv"
+
+if [ ! -e "$filename" ]
+then
+	LD_PRELOAD=figures/libsi_us.so figures/log2csv -s "baseline$class,preempt$class" -n "s|.*$percentile%\s\+||p" "$1"/*.log >"$filename"
+fi
+
+figures/linegraph graph.png <"$filename"
