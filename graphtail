@@ -1,0 +1,15 @@
+#!/bin/sh
+
+percentile="90"
+if [ "$#" -ge "2" ]
+then
+	percentile="$2"
+fi
+
+class="Short"
+if [ "$#" -eq "3" ]
+then
+	class="Long"
+fi
+
+LD_PRELOAD=figures/libsi_us.so figures/log2csv -s "baseline$class,preempt$class" -n "s|.*$percentile%\s\+||p" "$1"/*.log | figures/linegraph graph.png
