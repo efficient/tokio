@@ -1,6 +1,7 @@
 local short
 local long
-local thresh
+local islong
+local count = 1
 
 function init(args)
 	if table.getn(args) ~= 2
@@ -11,17 +12,34 @@ function init(args)
 
 	short = wrk.format('GET')
 	long = wrk.format('GET', args[1])
-	thresh = tonumber(args[2])
+
+	local thresh = tonumber(args[2])
+	islong = {}
+	for i = 1, 100
+	do
+		islong[i] = false
+	end
 
 	local seed = string.gsub(tostring(wrk.thread), 'userdata: 0x', '')
 	math.randomseed(tonumber(seed, 16))
+	for i = 1, thresh
+	do
+		local index
+		repeat
+			index = math.random(100)
+		until not islong[index]
+
+		islong[index] = true
+	end
 end
 
 function request()
-	if math.random(100) <= thresh
+	local req = short
+	if islong[count]
 	then
-		return long
-	else
-		return short
+		req = long
 	end
+
+	count = count % 100 + 1
+	return req
 end
