@@ -12,7 +12,9 @@ function init(args)
 	short = wrk.format('GET')
 	long = wrk.format('GET', args[1])
 	thresh = tonumber(args[2])
-	math.randomseed(os.time())
+
+	local seed = string.gsub(tostring(wrk.thread), 'userdata: 0x', '')
+	math.randomseed(tonumber(seed, 16))
 end
 
 function request()
