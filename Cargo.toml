@@ -16,3 +16,9 @@ path = "tokio/tokio"
 
 [patch.crates-io.tokio-threadpool]
 path = "tokio/tokio-threadpool"
+
+[lib]
+harness = false
+
+[dev-dependencies]
+bencher = "*"
