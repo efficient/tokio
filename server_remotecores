@@ -53,7 +53,7 @@ scp $HELPERS client:wrk
 
 stop 2>/dev/null || true
 
-for indep in `seq 0 5 20`
+for indep in `seq 0 2 20`
 do
 	echo "==> INDEP: `echo "$indep" | sed "s/\(.*\)\(.\)/\1.\2/;s/^\./0&/"`% long requests <=="
 	for series in baseline preempt
