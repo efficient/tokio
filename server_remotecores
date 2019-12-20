@@ -1,6 +1,7 @@
 #!/bin/sh
 
 readonly HELPER="client_bimodal"
+readonly HELPERS="$HELPER bimodal.lua"
 readonly NCLIENTCORES="14" # client
 readonly MSERVERCORES="0xaaaaaaaa" # server
 
@@ -48,16 +49,13 @@ mkdir "$dir"
 ./version >"$dir/VERSION"
 
 unset SSH_AUTH_SOCK
-if [ "`ssh client md5sum "wrk/$HELPER" | cut -d" " -f1`" != "`md5sum "$HELPER" | cut -d" " -f1`" ]
-then
-	scp "$HELPER" "client:wrk"
-fi
+scp $HELPERS client:wrk
 
 stop 2>/dev/null || true
 
-for indep in `seq 0 "$((NCLIENTCORES / 3))"`
+for indep in `seq 0 5`
 do
-	echo "==> INDEP: $indep long-request cores <=="
+	echo "==> INDEP: `echo "$indep" | sed "s/\(.*\)\(.\)/\1.\2/;s/^\./0&/"`% long requests <=="
 	for series in baseline preempt
 	do
 		echo "   --> SERIES: $series server <--"

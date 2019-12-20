@@ -1,35 +1,40 @@
 #!/bin/sh
 
+readonly  DIST="bimodal.lua"
 readonly   URL="http://192.168.0.1:1337"
-readonly  LONG="1000000"
 readonly SHORT="0010000"
+readonly  LONG="1000000"
 
 set -eu
 series="$1" # server part
-indep="$2" # num cores making long requests
+indep="$2" # percentage of long requests
 const="$3" # total num cores
 name="$4" # experiment name
 
 coregroup() {
 	local start="$1"
 	local count="$2"
-	local url="$3"
+	shift 2
+
 	for core in `seq "$start" 2 "$((count * 2 - 1))"`
 	do
-		taskset -c "$core" ./wrk --latency -t 1 "$url" &
+		taskset -c "$core" ./wrk -s"$DIST" -t1 --latency "$@" &
 	done
 }
 
 logfile() {
-	local half="$1"
+	local half=""
+	if [ $# -ne 0 ]
+	then
+		half="$1"
+	fi
+
 	echo "${indep}_${series}${half}_$name$const.log"
 }
 
 cd "`dirname "$0"`"
 
-coregroup 0 "$indep" "$URL/$LONG" >"`logfile Long`" 2>&1
-coregroup "$((indep * 2))" "$const" "$URL/$SHORT" >"`logfile Short`" 2>&1
+coregroup 0 "$const" "$URL/$SHORT" "/$LONG" "$indep" >"`logfile`" 2>&1
 wait
 
-logfile Long
-logfile Short
+logfile
