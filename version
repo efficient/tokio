@@ -20,7 +20,7 @@ ld() {
 }
 
 ldd() {
-	oneline "$(dirname "$(readlink -f inger/ld.so)")/ldd" "$@"
+	oneline "$(dirname "$(readlink -f inger/ld.so)")/../bin/ldd" "$@"
 }
 
 oneline() {
