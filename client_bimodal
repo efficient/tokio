@@ -7,7 +7,7 @@ readonly  LONG="300000" # ≈500 μs
 
 set -eu
 series="$1" # server part
-indep="$2" # percentage of long requests
+indep="$2" # permillage of long requests
 const="$3" # total num cores
 name="$4" # experiment name
 

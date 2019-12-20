@@ -6,7 +6,7 @@ local count = 1
 function init(args)
 	if table.getn(args) ~= 2
 	then
-		print('USAGE: wrk [arg]... -s.../bimodal.lua <url> <altpath> <alt%>')
+		print('USAGE: wrk [arg]... -s.../bimodal.lua <url> <altpath> <alt‰>')
 		os.exit(1)
 	end
 
@@ -15,7 +15,7 @@ function init(args)
 
 	local thresh = tonumber(args[2])
 	islong = {}
-	for i = 1, 100
+	for i = 1, 1000
 	do
 		islong[i] = false
 	end
@@ -26,7 +26,7 @@ function init(args)
 	do
 		local index
 		repeat
-			index = math.random(100)
+			index = math.random(1000)
 		until not islong[index]
 
 		islong[index] = true
@@ -40,6 +40,6 @@ function request()
 		req = long
 	end
 
-	count = count % 100 + 1
+	count = count % 1000 + 1
 	return req
 end
