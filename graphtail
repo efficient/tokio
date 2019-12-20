@@ -20,9 +20,18 @@ then
 fi
 filename="$filename.csv"
 
+script="s|.*$percentile%\s\+||p"
+wrapper="LD_PRELOAD=figures/libsi_us.so"
+if [ "$percentile" = "tput" ]
+then
+	script="s|^Requests/sec:\s\+||p"
+	wrapper=""
+fi
+
 if [ ! -e "$filename" ]
 then
-	LD_PRELOAD=figures/libsi_us.so figures/log2csv -s "baseline$class,preempt$class" -n "s|.*$percentile%\s\+||p" "$1"/*.log >"$filename"
+	eval export "$wrapper" >/dev/null
+	figures/log2csv -s "baseline$class,preempt$class" -n "$script" "$1"/*.log >"$filename"
 fi
 
 figures/linegraph graph.png <"$filename"
