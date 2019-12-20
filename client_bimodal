@@ -18,7 +18,12 @@ coregroup() {
 
 	for core in `seq "$start" 2 "$((count * 2 - 1))"`
 	do
+		if [ "$core" = "$start" ]
+		then
+			set -x
+		fi
 		taskset -c "$core" ./wrk -s"$DIST" -t1 --latency "$@" &
+		set +x
 	done
 }
 
