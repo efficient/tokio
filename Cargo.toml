@@ -11,5 +11,8 @@ pretty_env_logger = "*"
 hyper = "0.12.35"
 tokio-threadpool = "*"
 
+[patch.crates-io.tokio]
+path = "tokio/tokio"
+
 [patch.crates-io.tokio-threadpool]
 path = "tokio/tokio-threadpool"
