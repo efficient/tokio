@@ -6,15 +6,15 @@ then
 	exit 1
 fi
 
-class="Short"
+class=""
 if [ "$#" -eq "3" ]
 then
-	class="Long"
+	class="$3"
 fi
 
 percentile="$2"
 filename="$1_$percentile"
-if [ "$class" != "Short" ]
+if [ -n "$class" ]
 then
 	filename="$filename-$class"
 fi
