@@ -22,7 +22,7 @@ coregroup() {
 		then
 			set -x
 		fi
-		taskset -c "$core" ./wrk -s"$DIST" -t1 --latency "$@" &
+		taskset -c "$core" ./wrk -s"$DIST" -t1 -d30 --latency "$@" &
 		set +x
 	done
 }
