@@ -2,8 +2,8 @@
 
 readonly  DIST="bimodal.lua"
 readonly   URL="http://192.168.0.1:1337"
-readonly SHORT="000100" # ≈500 ns
-readonly  LONG="300000" # ≈500 μs
+readonly SHORT="000300000" # ≈500 μs
+readonly  LONG="300000000" # ≈500 ms
 
 set -eu
 series="$1" # server part
