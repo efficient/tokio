@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cargo clean
+rm -f Cargo.lock
+inger/configure
