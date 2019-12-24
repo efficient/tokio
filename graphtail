@@ -41,4 +41,4 @@ else
 	echo "$csv" >"$filename"
 fi
 
-figures/linegraph graph.png <"$filename"
+figures/linegraph "`echo "$filename" | sed "s/\.csv$/.png/"`" <"$filename"
