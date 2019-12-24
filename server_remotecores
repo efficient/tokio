@@ -29,6 +29,17 @@ baseline() {
 	ssh client "wrk/$HELPER" baseline "$@"
 }
 
+overhead() {
+	set -ex
+	cargo build --release
+	cargo build --release --features preemptive -pinger
+
+	export LD_PRELOAD="target/release/libinger.so"
+	export LIBGOTCHA_NUMGROUPS="1"
+	start >&2
+	ssh client "wrk/$HELPER" overhead "$@"
+}
+
 preempt() {
 	set -ex
 	export LIBGOTCHA_NOGLOBALS=
@@ -56,7 +67,7 @@ stop 2>/dev/null || true
 for indep in `seq 0 2 20`
 do
 	echo "==> INDEP: `echo "$indep" | sed "s/\(.*\)\(.\)/\1.\2/;s/^\./0&/"`% long requests <=="
-	for series in baseline preempt
+	for series in baseline overhead preempt
 	do
 		echo "   --> SERIES: $series server <--"
 		until
