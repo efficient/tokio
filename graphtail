@@ -21,12 +21,13 @@ fi
 filename="$filename.csv"
 
 script="s|.*$percentile%\s\+||p"
-wrapper="LD_PRELOAD=figures/libsi_us.so"
+wrapper=":figures/libsi_us.so"
 if [ "$percentile" = "tput" ]
 then
 	script="s|^Requests/sec:\s\+||p"
 	wrapper=""
 fi
+wrapper="LD_PRELOAD=figures/libpermille_percent.so:$wrapper"
 
 eval export "$wrapper" >/dev/null
 csv="`figures/log2csv -s "baseline$class,preempt$class" -n "$script" "$1"/*.log`"
