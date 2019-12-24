@@ -28,10 +28,17 @@ then
 	wrapper=""
 fi
 
-if [ ! -e "$filename" ]
+eval export "$wrapper" >/dev/null
+csv="`figures/log2csv -s "baseline$class,preempt$class" -n "$script" "$1"/*.log`"
+unset LD_PRELOAD
+
+if [ -e "$filename" ]
 then
-	eval export "$wrapper" >/dev/null
-	figures/log2csv -s "baseline$class,preempt$class" -n "$script" "$1"/*.log >"$filename"
+	bytes="`head -n2 "$filename" | wc -c`"
+	truncate -s"$bytes" "$filename"
+	echo "$csv" | tail -n+3 >>"$filename"
+else
+	echo "$csv" >"$filename"
 fi
 
 figures/linegraph graph.png <"$filename"
