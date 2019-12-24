@@ -71,4 +71,6 @@ do
 	done
 done 2>&1 | tee "$dir/LOG"
 
+cp Cargo.lock "$dir/DEPS"
+
 echo "SUCCESS!  Results are in $dir/"
