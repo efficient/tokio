@@ -24,7 +24,7 @@ fn main() -> Result<(), Cow<'static, str>> {
 	Ok(())
 }
 
-fn transform_x(x: usize) -> usize {
+fn transform_x(x: i32) -> f64 {
 	use std::mem::transmute;
 	extern "C" {
 		#[linkage = "extern_weak"]
@@ -33,9 +33,9 @@ fn transform_x(x: usize) -> usize {
 
 	unsafe {
 		if transform_x.is_null() {
-			x
+			x.into()
 		} else {
-			let transform: extern "C" fn(usize) -> usize = transmute(transform_x);
+			let transform: extern "C" fn(i32) -> f64 = transmute(transform_x);
 			transform(x)
 		}
 	}
@@ -140,17 +140,17 @@ impl File {
 		self.basename().split(Self::DELIM).next().unwrap()
 	}
 
-	fn x_num(&self) -> usize {
+	fn x_num(&self) -> i32 {
 		Self::try_parse(self.x()).unwrap()
 	}
 
-	fn try_parse(num: &str) -> Option<usize> {
+	fn try_parse(num: &str) -> Option<i32> {
 		let mut numb = num.split("0x").last().unwrap();
 		if numb == num {
 			numb = num.split("0X").last().unwrap();
 		}
 		let radix = if numb == num { 10 } else { 16 };
-		usize::from_str_radix(numb, radix).ok()
+		i32::from_str_radix(numb, radix).ok()
 	}
 
 	fn try_series(name: &str) -> Option<&str> {

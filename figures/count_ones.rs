@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
 #[no_mangle]
-extern "C" fn transform_x(x: usize) -> usize {
-	x.count_ones() as _
+extern "C" fn transform_x(x: i32) -> f64 {
+	x.count_ones().into()
 }
