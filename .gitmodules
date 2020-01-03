@@ -8,3 +8,4 @@
 [submodule "wrk"]
 	path = wrk
 	url = ../wrk
+	branch = latclasses
