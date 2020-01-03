@@ -51,8 +51,8 @@ end
 function lseries(request)
 	if request == short
 	then
-		return 0
-	else
 		return 1
+	else
+		return 2
 	end
 end
