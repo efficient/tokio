@@ -35,7 +35,7 @@ then
 	script="s|^Requests/sec:\s\+||p"
 	wrapper=""
 fi
-wrapper="LD_PRELOAD=figures/libpermille_percent.so:$wrapper"
+wrapper="LD_PRELOAD=figures/libpermille_percent.so$wrapper"
 
 eval export "$wrapper" >/dev/null
 csv="`figures/log2csv -s "baseline$class,overhead$class,preempt$class" -n "$script" "$1"/*.log`"
