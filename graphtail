@@ -38,7 +38,7 @@ fi
 wrapper="LD_PRELOAD=figures/libpermille_percent.so$wrapper"
 
 eval export "$wrapper" >/dev/null
-csv="`figures/log2csv -s "baseline$class,overhead$class,preempt$class" -n "$script" "$1"/*.log`"
+csv="`figures/log2csv -s "baseline,overhead,preempt" -n "$script" "$1"/*.log`"
 unset LD_PRELOAD
 
 if [ -e "$filename" ]
