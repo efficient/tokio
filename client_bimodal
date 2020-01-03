@@ -22,7 +22,7 @@ coregroup() {
 		then
 			set -x
 		fi
-		taskset -c "$core" ./wrk -s"$DIST" -t1 -d30 --latency "$@" &
+		taskset -c "$core" env LD_LIBRARY_PATH=. ./ld-linux-x86-64.so.2 ./wrk -s"$DIST" -t1 -d30 --latency "$@" &
 		set +x
 	done
 }
