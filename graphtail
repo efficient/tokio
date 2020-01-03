@@ -2,7 +2,7 @@
 
 if [ "$#" -lt "2" ]
 then
-	echo "USAGE: $0 <directory> <percentile> []"
+	echo "USAGE: $0 <directory> <percentile> [class]"
 	exit 1
 fi
 
@@ -17,10 +17,18 @@ filename="$1_$percentile"
 if [ -n "$class" ]
 then
 	filename="$filename-$class"
+	case "$class" in
+	short)
+		class="1"
+		;;
+	long)
+		class="2"
+		;;
+	esac
 fi
 filename="$filename.csv"
 
-script="s|.*$percentile%\s\+||p"
+script="s|^$class\s*$percentile%\s\+||p"
 wrapper=":figures/libsi_us.so"
 if [ "$percentile" = "tput" ]
 then
