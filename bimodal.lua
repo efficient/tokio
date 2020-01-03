@@ -43,3 +43,16 @@ function request()
 	count = count % 1000 + 1
 	return req
 end
+
+function nlseries()
+	return 2
+end
+
+function lseries(request)
+	if request == short
+	then
+		return 0
+	else
+		return 1
+	end
+end
