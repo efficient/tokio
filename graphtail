@@ -2,14 +2,25 @@
 
 if [ "$#" -lt "2" ]
 then
-	echo "USAGE: $0 <directory> <percentile> [class]"
+	cat <<-tac
+		USAGE: $0 <directory> <percentile> [class] [series]
+
+		[class] selects a single subseries, and is only applicable to latency operation
+		[series] is a comma-separated list of series to plot
+	tac
 	exit 1
 fi
 
 class=""
-if [ "$#" -eq "3" ]
+if [ "$#" -ge "3" ]
 then
 	class="$3"
+fi
+
+series="baseline,overhead,preempt"
+if [ "$#" -eq "4" ]
+then
+	series="$4"
 fi
 
 percentile="$2"
@@ -38,8 +49,17 @@ fi
 wrapper="LD_PRELOAD=figures/libpermille_percent.so$wrapper"
 
 eval export "$wrapper" >/dev/null
-csv="`figures/log2csv -s "baseline,overhead,preempt" -n "$script" "$1"/*.log`"
+csv="`figures/log2csv -s "$series" -n "$script" "$1"/*.log`"
+csvd="$?"
 unset LD_PRELOAD
+if [ "$csvd" -ne "0" ]
+then
+	cat >&2 <<-tac
+
+		Hmm... maybe try running with a custom [series] set?
+	tac
+	exit 2
+fi
 
 if [ -e "$filename" ]
 then
