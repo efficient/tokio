@@ -67,6 +67,7 @@ scp $HELPERS client:wrk
 
 stop 2>/dev/null || true
 
+echo "$ $0 $#" >"$dir/LOG"
 for indep in `seq 0 2 20`
 do
 	echo "==> INDEP: `echo "$indep" | sed "s/\(.*\)\(.\)/\1.\2/;s/^\./0&/"`% long requests <=="
@@ -83,7 +84,7 @@ do
 			:
 		done
 	done
-done 2>&1 | tee "$dir/LOG"
+done 2>&1 | tee -a "$dir/LOG"
 
 cp Cargo.lock "$dir/DEPS"
 
