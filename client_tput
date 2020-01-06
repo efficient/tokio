@@ -1,0 +1,16 @@
+#!/bin/sh
+
+series="$1" # series part
+conns="$2" # connections per core
+readonly const="1" # num cores is presently ignored
+name="$4" # experiment name
+addr="$5" # server address
+
+. wrk/client.sh
+data="`coregroup 0 1 -c"$conns" "$URL/0" 2>&1`"
+wait
+
+indep="`echo "$data" | sed -n "s|^Requests/sec:\s\+\(.\+\)\..*|\1|p"`"
+echo "$data" >"`logfile`"
+
+logfile
