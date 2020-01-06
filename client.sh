@@ -1,4 +1,4 @@
-readonly   URL="http://192.168.0.1:1337"
+readonly   URL="http://$addr:1337"
 
 coregroup() {
 	local start="$1"

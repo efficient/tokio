@@ -2,14 +2,15 @@ readonly HELPERS="$HELPER client.sh wrk/wrk /lib/x86_64-linux-gnu/ld-linux-x86-6
 readonly NCLIENTCORES="14" # client
 readonly MSERVERCORES="0xaaaaaaaa" # server
 
-if [ "$#" -ne "1" ]
+if [ "$#" -ne "2" ]
 then
-	echo "USAGE: $0 <dest dir>"
+	echo "USAGE: $0 <dest dir> <my ip>"
 	exit 1
 fi
 
 set -eu
 dir="$1" # where to store
+addr="$2" # address at which server can be reached
 
 start() {
 	taskset "$MSERVERCORES" cargo run --release "$@" &
@@ -77,7 +78,7 @@ do
 	do
 		echo "   --> SERIES: $series server <--"
 		until
-			for file in `"$series" "$indep" "$NCLIENTCORES" "$dir"`
+			for file in `"$series" "$indep" "$NCLIENTCORES" "$dir" "$addr"`
 			do
 				rsync --remove-source-files "client:wrk/$file" "$dir"
 			done

@@ -8,6 +8,7 @@ series="$1" # server part
 indep="$2" # permillage of long requests
 const="$3" # total num cores
 name="$4" # experiment name
+addr="$5" # server address
 
 . wrk/client.sh
 coregroup 0 "$const" -s"$DIST" "$URL/$SHORT" "/$LONG" "$indep" >"`logfile`" 2>&1
