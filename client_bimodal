@@ -1,45 +1,16 @@
 #!/bin/sh
 
 readonly  DIST="bimodal.lua"
-readonly   URL="http://192.168.0.1:1337"
 readonly SHORT="000300000" # ≈500 μs
 readonly  LONG="300000000" # ≈500 ms
 
-set -eu
 series="$1" # server part
 indep="$2" # permillage of long requests
 const="$3" # total num cores
 name="$4" # experiment name
 
-coregroup() {
-	local start="$1"
-	local count="$2"
-	shift 2
-
-	for core in `seq "$start" 2 "$((count * 2 - 1))"`
-	do
-		if [ "$core" = "$start" ]
-		then
-			set -x
-		fi
-		taskset -c "$core" env LD_LIBRARY_PATH=. ./ld-linux-x86-64.so.2 ./wrk -s"$DIST" -t1 -d30 --latency "$@" &
-		set +x
-	done
-}
-
-logfile() {
-	local half=""
-	if [ $# -ne 0 ]
-	then
-		half="$1"
-	fi
-
-	echo "${indep}_${series}${half}_$name$const.log"
-}
-
-cd "`dirname "$0"`"
-
-coregroup 0 "$const" "$URL/$SHORT" "/$LONG" "$indep" >"`logfile`" 2>&1
+. wrk/client.sh
+coregroup 0 "$const" -s"$DIST" "$URL/$SHORT" "/$LONG" "$indep" >"`logfile`" 2>&1
 wait
 
 logfile
