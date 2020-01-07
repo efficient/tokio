@@ -1,6 +1,6 @@
 #!/bin/sh
 
 readonly HELPER="client_tput"
-readonly INDEPS="`seq 10`"
+readonly INDEPS="`seq 10 | sed "s/^/-c/"`"
 
 . ./server.sh

@@ -1,16 +1,27 @@
 #!/bin/sh
 
 series="$1" # series part
-conns="$2" # connections per core
-readonly const="1" # num cores is presently ignored
+switch="$2" # command-line switch(es) (if it starts w/ a '-') or num cores (o.w.)
+# total num cores is presently ignored
 name="$4" # experiment name
 addr="$5" # server address
 
+case "$switch" in
+-*)
+	const="1"
+	;;
+*)
+	const="$switch"
+	switch=""
+	;;
+esac
+
 . wrk/client.sh
-data="`coregroup 0 1 -c"$conns" "$URL/0" 2>&1`"
+data="`coregroup 0 "$const" $switch "$URL/0" 2>&1`"
 wait
 
-indep="`echo "$data" | sed -n "s|^Requests/sec:\s\+\(.\+\)\..*|\1|p"`"
+# NB: In the case of multiple cores, we currently just use the first one's throughput!
+indep="`echo "$data" | sed -n "s|^Requests/sec:\s\+\(.\+\)\..*|\1|p" | head -n1`"
 echo "$data" >"`logfile`"
 
 logfile
