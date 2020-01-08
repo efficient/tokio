@@ -70,7 +70,7 @@ scp $HELPERS client:wrk
 
 stop 2>/dev/null || true
 
-echo "$ $0 $#" >"$dir/LOG"
+echo "$ $0 $*" >"$dir/LOG"
 for indep in $INDEPS
 do
 	echo "==> INDEP: `echo "$indep" | logindep` <=="
