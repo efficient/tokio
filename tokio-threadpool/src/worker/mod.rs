@@ -464,7 +464,7 @@ impl Worker {
         match run {
             Idle => {}
             Schedule => {
-                if self.is_blocking.get() {
+                if cfg!(feature = "preemptive") || self.is_blocking.get() {
                     // The future has been notified while it was running.
                     // However, the future also entered a blocking section,
                     // which released the worker state from this thread.
