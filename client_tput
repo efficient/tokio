@@ -12,7 +12,7 @@ case "$switch" in
 	;;
 *)
 	const="$switch"
-	switch=""
+	switch="-c2"
 	;;
 esac
 

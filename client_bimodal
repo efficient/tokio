@@ -11,7 +11,7 @@ name="$4" # experiment name
 addr="$5" # server address
 
 . wrk/client.sh
-coregroup 0 "$const" -s"$DIST" "$URL/$SHORT" "/$LONG" "$indep" >"`logfile`" 2>&1
+coregroup 0 "$const" -s"$DIST" -c2 "$URL/$SHORT" "/$LONG" "$indep" >"`logfile`" 2>&1
 wait
 
 logfile
