@@ -1,8 +1,8 @@
 #!/bin/sh
 
 readonly  DIST="bimodal.lua"
-readonly SHORT="000300000" # ≈500 μs
-readonly  LONG="300000000" # ≈500 ms
+readonly SHORT="00300000" # ≈500 μs
+readonly  LONG="30000000" # ≈50  ms
 
 series="$1" # server part
 indep="$2" # permillage of long requests
