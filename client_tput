@@ -20,8 +20,7 @@ esac
 data="`coregroup 0 "$const" $switch "$URL/300000" 2>&1`"
 wait
 
-# NB: In the case of multiple cores, we currently just use the first one's throughput!
-indep="`echo "$data" | sed -n "s|^Requests/sec:\s\+\(.\+\)\..*|\1|p" | head -n1`"
+indep="`echo "$data" | sed -n "s|^Requests/sec:\s\+\(.\+\)\..*|\1|p" | paste -sd+ | bc`"
 echo "$data" >"`logfile`"
 
 logfile
