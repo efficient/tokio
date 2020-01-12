@@ -1,5 +1,6 @@
 /lib/
 /libinger
+/bench
 /png.rs
 /pngreadc
 /pngreadrs

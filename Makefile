@@ -11,6 +11,9 @@ CARGO := cargo
 MKDIR := mkdir -p
 RUSTC := rustc
 
+bench: png.rs lib/libtest.rlib lib/libpng16.so
+bench: private RUSTFLAGS += --test --extern test=lib/libtest.rlib
+
 pngreadc: lib/libpng16.so
 
 pngreadrs: png.rs lib/libpng16.so
@@ -23,6 +26,13 @@ lib/libinger.so: libinger/target/release/deps/libinger.so
 	cp $(<D)/*.so $(<D)/*.rlib $(@D)
 
 lib/libpng16.so: libpng/.libs/libpng16.so
+	$(MKDIR) $(@D)
+	cp $< $@
+
+lib/libtest.rlib:
+lib/libtest.rlib: private RUSTC := RUSTC_BOOTSTRAP= $(RUSTC)
+
+lib/test.rs: libinger/external/libgotcha/test.rs
 	$(MKDIR) $(@D)
 	cp $< $@
 
@@ -39,3 +49,6 @@ libpng/.libs/libpng16.so:
 
 %.rs: %.h
 	$(BINDGEN) $(BINDFLAGS) -o $@ $<
+
+lib%.rlib: %.rs
+	$(RUSTC) --crate-type lib --out-dir $(@D) $(RUSTFLAGS) $< $(LDLIBS)
