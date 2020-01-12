@@ -8,10 +8,11 @@ override RUSTFLAGS := --edition 2018 -Llib -O $(RUSTFLAGS)
 
 BINDGEN := bindgen
 CARGO := cargo
+LN := ln -sf
 MKDIR := mkdir -p
 RUSTC := rustc
 
-bench: png.rs pthread.rs lib/libtest.rlib lib/libinger.so lib/libpng16.so
+bench: png.rs pthread.rs lib/libtest.rlib lib/libinger.so lib/libpng16.so.16
 bench: private RUSTFLAGS += --test --extern test=lib/libtest.rlib
 bench: private RUSTFLAGS += -Clink-arg=-Wl,-R\$$ORIGIN/lib:$(shell $(RUSTC) --print sysroot)/lib/rustlib/x86_64-unknown-linux-gnu/lib
 
@@ -29,6 +30,9 @@ lib/libinger.so: libinger/target/release/deps/libinger.so
 lib/libpng16.so: libpng/.libs/libpng16.so
 	$(MKDIR) $(@D)
 	cp $< $@
+
+lib/libpng16.so.16: lib/libpng16.so
+	$(LN) $(<F) $@
 
 lib/libtest.rlib:
 lib/libtest.rlib: private RUSTC := RUSTC_BOOTSTRAP= $(RUSTC)
