@@ -1,0 +1,40 @@
+#!/bin/sh
+
+if [ "$#" -lt "3" ]
+then
+	echo "USAGE: $0 <harness executable> <output logfile> <confidence interval> [args...]"
+	exit 1
+fi
+
+harness="`realpath "$1"`"
+logfile="$2"
+interval="$3"
+if [ -e "$logfile" ]
+then
+	echo "$logfile: already exists" >&2
+	exit 2
+fi
+
+banner="$ $0 $*"
+printf "%s\n" "$banner" "`echo "$banner" | sed "s/./=/g"`" "" >"$logfile"
+shift 3
+
+log() {
+	echo "$ $*" >>"$logfile"
+	"$@" | tee -a "$logfile"
+}
+
+for bench in `"$harness" --list | sed -n "s/: benchmark$//p"`
+do
+	min=""
+	while [ -z "$min" ] || [ "$min" -ge "$interval" ]
+	do
+		cur="`log "$harness" --bench --exact "$bench"`"
+		echo "$cur"
+		cur="`echo "$cur" | sed -n "s/.*(+\/- \(.*\))$/\1/p" | tr -d ,`"
+		if [ -z "$min" ] || [ "$cur" -lt "$min" ]
+		then
+			min="$cur"
+		fi
+	done
+done
