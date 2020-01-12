@@ -1,0 +1,3 @@
+[submodule "libpng"]
+	path = libpng
+	url = git://git.code.sf.net/p/libpng/code
