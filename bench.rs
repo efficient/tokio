@@ -1,5 +1,7 @@
 #[allow(dead_code, nonstandard_style)]
 mod png;
+#[allow(dead_code, nonstandard_style)]
+mod pthread;
 
 use png::png_image;
 use std::ffi::c_void;
@@ -17,6 +19,53 @@ fn direct(lo: &mut impl Bencher) {
 	lo.iter(|| unsafe {
 		img.begin_read_from_memory(&src).unwrap();
 		img.finish_read(&mut dest).unwrap();
+	});
+}
+
+#[bench]
+fn thread(lo: &mut impl Bencher) {
+	use pthread::pthread_create;
+	use pthread::pthread_join;
+	use pthread::pthread_t;
+
+	let mut bufs = alloc_bufs().unwrap();
+	let bufs: *mut _ = &mut bufs;
+	let bufs: *mut c_void = bufs as _;
+	let mut tid = pthread_t::default();
+	lo.iter(|| unsafe {
+		pthread_create(&mut tid, null(), Some(main), bufs);
+		pthread_join(tid, null_mut());
+	});
+
+	unsafe extern fn main(img_src_dest: *mut c_void) -> *mut c_void {
+		let img_src_dest: *mut (png_image, Box<_>, Box<_>) = img_src_dest as _;
+		let (img, src, dest) = &mut *img_src_dest;
+		img.begin_read_from_memory(src).unwrap();
+		img.finish_read(dest).unwrap();
+		null_mut()
+	}
+}
+
+#[bench]
+fn process(lo: &mut impl Bencher) {
+	use pthread::pid_t;
+	use std::os::raw::c_int;
+	extern {
+		fn exit(_: c_int) -> !;
+		fn fork() -> pid_t;
+		fn wait(_: Option<&mut c_int>) -> pid_t;
+	}
+
+	let (mut img, src, mut dest) = alloc_bufs().unwrap();
+	lo.iter(|| unsafe {
+		let pid = fork();
+		if pid == 0 {
+			img.begin_read_from_memory(&src).unwrap();
+			img.finish_read(&mut dest).unwrap();
+			exit(0);
+		} else {
+			wait(None);
+		}
 	});
 }
 
