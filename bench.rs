@@ -6,6 +6,7 @@ mod png;
 mod pthread;
 
 use png::png_image;
+use std::convert::TryInto;
 use std::ffi::c_void;
 use std::fmt::Display;
 use std::fmt::Error;
@@ -14,6 +15,8 @@ use std::os::raw::c_uint;
 use std::ptr::null;
 use std::ptr::null_mut;
 use test::Bencher;
+
+const TIMEOUT_US: u64 = 10_000;
 
 #[bench]
 fn direct(lo: &mut impl Bencher) {
@@ -78,15 +81,36 @@ fn thread(lo: &mut impl Bencher) {
 
 #[bench]
 fn process(lo: &mut impl Bencher) {
-	use pthread::pid_t;
+	use png::__sigset_t as sigset_t;
+	use png::pid_t;
+	use png::timespec;
+	use std::ffi::c_void;
 	use std::os::raw::c_int;
 	extern {
 		fn exit(_: c_int) -> !;
 		fn fork() -> pid_t;
+		fn kill(_: pid_t, _: c_int) -> c_int;
+		fn sigaddset(_: *mut sigset_t, _: c_int);
+		fn sigemptyset(_: *mut sigset_t);
+		fn signal(_: c_int, _: extern fn(c_int)) -> extern fn(c_int);
+		fn sigtimedwait(_: *const sigset_t, _: Option<&mut c_void>, _: *const timespec) -> c_int;
 		fn waitpid(_: pid_t, _: Option<&mut c_int>, _: c_int) -> pid_t;
 	}
 
+	const SIGCHLD: c_int = 17;
+	const SIGKILL: c_int = 9;
 	let (mut img, src, mut dest) = alloc_bufs().unwrap();
+	let tout: i64 = TIMEOUT_US.try_into().unwrap();
+	let tout = timespec {
+		tv_nsec: tout * 1_000,
+		tv_sec: 0,
+	};
+	let mut chld = sigset_t::default();
+	unsafe {
+		sigemptyset(&mut chld);
+		sigaddset(&mut chld, SIGCHLD);
+		signal(SIGCHLD, handler);
+	}
 	lo.iter(|| unsafe {
 		let pid = fork();
 		if pid == 0 {
@@ -94,9 +118,14 @@ fn process(lo: &mut impl Bencher) {
 			img.finish_read(&mut dest).unwrap();
 			exit(0);
 		} else {
+			if sigtimedwait(&chld, None, &tout) != SIGCHLD {
+				kill(pid, SIGKILL);
+			}
 			waitpid(pid, None, 0);
 		}
 	});
+
+	extern fn handler(_: c_int) {}
 }
 
 #[bench]
@@ -146,7 +175,6 @@ fn alloc_bufs() -> Result<(png_image, Box<[u8]>, Box<[u8]>), String> {
 }
 
 fn src(file: &str) -> Result<Box<[u8]>, String> {
-	use std::convert::TryInto;
 	use std::fs::File;
 	use std::io::Read;
 
@@ -158,8 +186,6 @@ fn src(file: &str) -> Result<Box<[u8]>, String> {
 }
 
 fn dest(img: &png_image) -> Result<Box<[u8]>, String> {
-	use std::convert::TryInto;
-
 	assert!(img.format != 0);
 
 	let dest = img.size().try_into().ret("c_uint::try_into()")?;
