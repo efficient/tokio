@@ -11,8 +11,8 @@ CARGO := cargo
 MKDIR := mkdir -p
 RUSTC := rustc
 
-bench: png.rs pthread.rs lib/libtest.rlib lib/libpng16.so
-bench: private RUSTFLAGS += --test --extern test=lib/libtest.rlib
+bench: png.rs pthread.rs lib/libtest.rlib lib/libinger.so lib/libpng16.so
+bench: private RUSTFLAGS += --test --extern test=lib/libtest.rlib -Crpath
 
 pngreadc: lib/libpng16.so
 

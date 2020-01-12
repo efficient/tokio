@@ -1,3 +1,5 @@
+extern crate inger;
+
 #[allow(dead_code, nonstandard_style)]
 mod png;
 #[allow(dead_code, nonstandard_style)]
@@ -67,6 +69,40 @@ fn process(lo: &mut impl Bencher) {
 			wait(None);
 		}
 	});
+}
+
+#[bench]
+fn preempt(lo: &mut impl Bencher) {
+	use inger::launch;
+	use std::ops::Deref;
+	use std::ops::DerefMut;
+
+	let (img, src, mut dest) = alloc_bufs().unwrap();
+	let mut img = AssertSend (img);
+	lo.iter(|| drop(launch(|| unsafe {
+		img.begin_read_from_memory(&src).unwrap();
+		img.finish_read(&mut dest).unwrap();
+	}, u64::max_value()).unwrap()));
+
+	struct AssertSend<T> (T);
+
+	unsafe impl<T> Send for AssertSend<T> {}
+
+	impl<T> Deref for AssertSend<T> {
+		type Target = T;
+
+		fn deref(&self) -> &Self::Target {
+			let Self (this) = self;
+			this
+		}
+	}
+
+	impl<T> DerefMut for AssertSend<T> {
+		fn deref_mut(&mut self) -> &mut Self::Target {
+			let Self (this) = self;
+			this
+		}
+	}
 }
 
 fn alloc_bufs() -> Result<(png_image, Box<[u8]>, Box<[u8]>), String> {
