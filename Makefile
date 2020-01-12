@@ -4,7 +4,7 @@ override CFLAGS := -std=c99 -O2 $(CFLAGS)
 override CPPFLAGS := $(CPPFLAGS)
 override LDFLAGS := $(LDFLAGS)
 override LDLIBS := $(LDLIBS)
-override RUSTFLAGS := --edition 2018 -O $(RUSTFLAGS)
+override RUSTFLAGS := --edition 2018 -Llib -O $(RUSTFLAGS)
 
 BINDGEN := bindgen
 CARGO := cargo
@@ -14,11 +14,9 @@ RUSTC := rustc
 pngreadc: lib/libpng16.so
 
 pngreadrs: png.rs lib/libpng16.so
-pngreadrs: private LDLIBS += -lpng16
-pngreadrs: private RUSTFLAGS += -Llib
 
 png.rs:
-png.rs: private BINDFLAGS += --with-derive-default
+png.rs: private BINDFLAGS += --with-derive-default --raw-line '\#[link(name = "png16")] extern {}'
 
 lib/libinger.so: libinger/target/release/deps/libinger.so
 	$(MKDIR) $(@D)
