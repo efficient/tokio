@@ -44,6 +44,11 @@ libpng/.libs/libpng16.so:
 	cd libpng && ./configure
 	$(MAKE) -Clibpng
 
+.PHONY: clean
+clean:
+	$(RM) bench png.rs pthread.rs pngreadc pngreadrs
+	$(RM) -r lib
+
 %: %.rs
 	$(RUSTC) $(RUSTFLAGS) $< $(LDLIBS)
 
