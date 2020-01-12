@@ -83,7 +83,7 @@ fn process(lo: &mut impl Bencher) {
 	extern {
 		fn exit(_: c_int) -> !;
 		fn fork() -> pid_t;
-		fn wait(_: Option<&mut c_int>) -> pid_t;
+		fn waitpid(_: pid_t, _: Option<&mut c_int>, _: c_int) -> pid_t;
 	}
 
 	let (mut img, src, mut dest) = alloc_bufs().unwrap();
@@ -94,7 +94,7 @@ fn process(lo: &mut impl Bencher) {
 			img.finish_read(&mut dest).unwrap();
 			exit(0);
 		} else {
-			wait(None);
+			waitpid(pid, None, 0);
 		}
 	});
 }
