@@ -18,7 +18,7 @@ pngreadc: lib/libpng16.so
 
 pngreadrs: png.rs lib/libpng16.so
 
-png.rs:
+png.rs: lib/libpng16.so
 png.rs: private BINDFLAGS += --with-derive-default --raw-line '\#[link(name = "png16")] extern {}'
 
 lib/libinger.so: libinger/target/release/deps/libinger.so
