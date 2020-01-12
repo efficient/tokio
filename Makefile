@@ -8,7 +8,6 @@ CARGO := cargo
 MKDIR := mkdir -p
 
 pngreadc: lib/libpng16.so
-pngreadc: private CPPFLAGS += -Ilibpng
 
 lib/libinger.so: libinger/target/release/deps/libinger.so
 	$(MKDIR) $(@D)
