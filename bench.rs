@@ -26,17 +26,37 @@ fn direct(lo: &mut impl Bencher) {
 
 #[bench]
 fn thread(lo: &mut impl Bencher) {
+	use pthread::CLOCK_REALTIME;
+	use pthread::PTHREAD_CANCEL_ASYNCHRONOUS;
+	use pthread::clock_gettime;
+	use pthread::pthread_cancel;
 	use pthread::pthread_create;
-	use pthread::pthread_join;
+	use pthread::pthread_setcanceltype;
+	use pthread::pthread_timedjoin_np;
 	use pthread::pthread_t;
+	use pthread::timespec;
+	use std::ops::AddAssign;
 
 	let mut bufs = alloc_bufs().unwrap();
 	let bufs: *mut _ = &mut bufs;
 	let bufs: *mut c_void = bufs as _;
+	let tout: i64 = TIMEOUT_US.try_into().unwrap();
+	let tout = timespec {
+		tv_nsec: tout * 1_000,
+		tv_sec: 0,
+	};
 	let mut tid = pthread_t::default();
+	unsafe {
+		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS.try_into().unwrap(), null_mut());
+	}
 	lo.iter(|| unsafe {
+		let mut ts = timespec::default();
+		clock_gettime(CLOCK_REALTIME as _, &mut ts);
+		ts += &tout;
 		pthread_create(&mut tid, null(), Some(main), bufs);
-		pthread_join(tid, null_mut());
+		if pthread_timedjoin_np(tid, null_mut(), &ts) != 0 {
+			pthread_cancel(tid);
+		}
 	});
 
 	unsafe extern fn main(img_src_dest: *mut c_void) -> *mut c_void {
@@ -45,6 +65,14 @@ fn thread(lo: &mut impl Bencher) {
 		img.begin_read_from_memory(src).unwrap();
 		img.finish_read(dest).unwrap();
 		null_mut()
+	}
+
+	impl AddAssign<&timespec> for timespec {
+		fn add_assign(&mut self, other: &timespec) {
+			let nsec = self.tv_nsec + other.tv_nsec;
+			self.tv_sec += nsec / 1_000_000_000;
+			self.tv_nsec += nsec % 1_000_000_000;
+		}
 	}
 }
 

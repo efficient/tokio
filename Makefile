@@ -1,4 +1,4 @@
-override BINDFLAGS := --no-layout-tests $(BINDFLAGS)
+override BINDFLAGS := --with-derive-default --no-layout-tests $(BINDFLAGS)
 override CARGOFLAGS := --release $(CARGOFLAGS)
 override CFLAGS := -std=c99 -O2 $(CFLAGS)
 override CPPFLAGS := $(CPPFLAGS)
@@ -21,7 +21,11 @@ pngreadc: lib/libpng16.so
 pngreadrs: png.rs lib/libpng16.so
 
 png.rs: lib/libpng16.so
-png.rs: private BINDFLAGS += --with-derive-default --raw-line '\#[link(name = "png16")] extern {}'
+png.rs: private BINDFLAGS += --raw-line '\#[link(name = "png16")] extern {}'
+
+pthread.rs:
+pthread.rs: private CPPFLAGS += -D_GNU_SOURCE
+pthread.rs: private BINDFLAGS += --no-derive-debug --opaque-type timex
 
 lib/libinger.so: libinger/target/release/deps/libinger.so
 	$(MKDIR) $(@D)
@@ -58,7 +62,7 @@ clean:
 	$(RUSTC) $(RUSTFLAGS) $< $(LDLIBS)
 
 %.rs: %.h
-	$(BINDGEN) $(BINDFLAGS) -o $@ $<
+	$(BINDGEN) $(BINDFLAGS) -o $@ $< -- $(CPPFLAGS)
 
 lib%.rlib: %.rs
 	$(RUSTC) --crate-type lib --out-dir $(@D) $(RUSTFLAGS) $< $(LDLIBS)
