@@ -131,15 +131,31 @@ fn process(lo: &mut impl Bencher) {
 #[bench]
 fn preempt(lo: &mut impl Bencher) {
 	use inger::launch;
+	use std::cell::UnsafeCell;
 	use std::ops::Deref;
 	use std::ops::DerefMut;
+	use std::sync::mpsc::channel;
+	use std::sync::Arc;
+	use std::thread::spawn;
 
-	let (img, src, mut dest) = alloc_bufs().unwrap();
-	let mut img = AssertSend (img);
-	lo.iter(|| drop(launch(|| unsafe {
-		img.begin_read_from_memory(&src).unwrap();
-		img.finish_read(&mut dest).unwrap();
-	}, u64::max_value()).unwrap()));
+	let bufs = Arc::from(UnsafeCell::from(alloc_bufs().unwrap()));
+	let (send, recv) = channel();
+	let reaper = spawn(move || while let Some(fun) = recv.recv().unwrap() {
+		drop(fun);
+	});
+	lo.iter(|| {
+		let bufs = AssertSend (bufs.clone());
+		let fun = launch(move || unsafe {
+			let (img, src, dest) = &mut *bufs.get();
+			img.begin_read_from_memory(src).unwrap();
+			img.finish_read(dest).unwrap();
+		}, TIMEOUT_US).unwrap();
+		if fun.is_continuation() {
+			send.send(fun.into()).unwrap();
+		}
+	});
+	send.send(None).unwrap();
+	reaper.join().unwrap();
 
 	struct AssertSend<T> (T);
 
