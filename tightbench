@@ -29,7 +29,7 @@ log() {
 log git log --oneline --no-decorate -1
 log git -C libinger log --oneline --no-decorate -1
 
-for bench in `"$harness" --list | sed -n "s/: benchmark$//p"`
+for bench in `"$harness" --list "$@" | sed -n "s/: benchmark$//p"`
 do
 	min=""
 	while [ -z "$min" ] || [ "$min" -ge "$interval" ]
