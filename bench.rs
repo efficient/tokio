@@ -135,16 +135,17 @@ fn preempt(lo: &mut impl Bencher) {
 	use std::ops::Deref;
 	use std::ops::DerefMut;
 	use std::sync::mpsc::channel;
-	use std::sync::Arc;
 	use std::thread::spawn;
 
-	let bufs = Arc::from(UnsafeCell::from(alloc_bufs().unwrap()));
+	let bufs = UnsafeCell::from(alloc_bufs().unwrap());
 	let (send, recv) = channel();
 	let reaper = spawn(move || while let Some(fun) = recv.recv().unwrap() {
 		drop(fun);
 	});
 	lo.iter(|| {
-		let bufs = AssertSend (bufs.clone());
+		let bufs = AssertSend (unsafe {
+			unbound(&bufs)
+		});
 		let fun = launch(move || unsafe {
 			let (img, src, dest) = &mut *bufs.get();
 			img.begin_read_from_memory(src).unwrap();
@@ -175,6 +176,10 @@ fn preempt(lo: &mut impl Bencher) {
 			let Self (this) = self;
 			this
 		}
+	}
+
+	unsafe fn unbound<'a, 'b, T>(t: &'a T) -> &'b T {
+		(|t: *const T| &*t)(t)
 	}
 }
 
