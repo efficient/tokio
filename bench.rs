@@ -73,8 +73,8 @@ fn thread(lo: &mut impl Bencher) {
 	impl AddAssign<&timespec> for timespec {
 		fn add_assign(&mut self, other: &timespec) {
 			let nsec = self.tv_nsec + other.tv_nsec;
-			self.tv_sec += nsec / 1_000_000_000;
-			self.tv_nsec += nsec % 1_000_000_000;
+			self.tv_sec = nsec / 1_000_000_000;
+			self.tv_nsec = nsec % 1_000_000_000;
 		}
 	}
 }
