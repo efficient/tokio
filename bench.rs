@@ -50,9 +50,6 @@ fn thread(lo: &mut impl Bencher) {
 		tv_sec: 0,
 	};
 	let mut tid = pthread_t::default();
-	unsafe {
-		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS.try_into().unwrap(), null_mut());
-	}
 	lo.iter(|| unsafe {
 		let mut ts = timespec::default();
 		clock_gettime(CLOCK_REALTIME as _, &mut ts);
@@ -67,6 +64,7 @@ fn thread(lo: &mut impl Bencher) {
 	unsafe extern fn main(img_src_dest: *mut c_void) -> *mut c_void {
 		let img_src_dest: *mut (png_image, Box<_>, Box<_>) = img_src_dest as _;
 		let (img, src, dest) = &mut *img_src_dest;
+		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS.try_into().unwrap(), null_mut());
 		img.begin_read_from_memory(src).unwrap();
 		img.finish_read(dest).unwrap();
 		null_mut()
