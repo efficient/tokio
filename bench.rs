@@ -30,12 +30,12 @@ fn direct(lo: &mut impl Bencher) {
 #[bench]
 fn thread(lo: &mut impl Bencher) {
 	use pthread::CLOCK_REALTIME;
-	use pthread::PTHREAD_CANCEL_ASYNCHRONOUS;
+	//use pthread::PTHREAD_CANCEL_ASYNCHRONOUS;
 	use pthread::clock_gettime;
 	use pthread::pthread_cancel;
 	use pthread::pthread_create;
 	use pthread::pthread_join;
-	use pthread::pthread_setcanceltype;
+	//use pthread::pthread_setcanceltype;
 	use pthread::pthread_timedjoin_np;
 	use pthread::pthread_t;
 	use pthread::timespec;
@@ -64,7 +64,7 @@ fn thread(lo: &mut impl Bencher) {
 	unsafe extern fn main(img_src_dest: *mut c_void) -> *mut c_void {
 		let img_src_dest: *mut (png_image, Box<_>, Box<_>) = img_src_dest as _;
 		let (img, src, dest) = &mut *img_src_dest;
-		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS.try_into().unwrap(), null_mut());
+		//pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS.try_into().unwrap(), null_mut());
 		img.begin_read_from_memory(src).unwrap();
 		img.finish_read(dest).unwrap();
 		null_mut()
