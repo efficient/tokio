@@ -34,6 +34,7 @@ fn thread(lo: &mut impl Bencher) {
 	use pthread::clock_gettime;
 	use pthread::pthread_cancel;
 	use pthread::pthread_create;
+	use pthread::pthread_join;
 	use pthread::pthread_setcanceltype;
 	use pthread::pthread_timedjoin_np;
 	use pthread::pthread_t;
@@ -59,6 +60,7 @@ fn thread(lo: &mut impl Bencher) {
 		pthread_create(&mut tid, null(), Some(main), bufs);
 		if pthread_timedjoin_np(tid, null_mut(), &ts) != 0 {
 			pthread_cancel(tid);
+			pthread_join(tid, null_mut());
 		}
 	});
 
