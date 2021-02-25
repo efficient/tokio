@@ -35,6 +35,10 @@ pub use task_impl::{Spawn, spawn, Unpark, Executor, Run, park};
 
 pub use task_impl::{Task, AtomicTask, current, init, is_in_task};
 
+#[cfg(feature = "use_std")]
+#[doc(hidden)]
+pub use task_impl::tls_slot;
+
 #[allow(deprecated)]
 #[cfg(feature = "use_std")]
 pub use task_impl::{LocalKey, with_unpark_event, UnparkEvent, EventSet};

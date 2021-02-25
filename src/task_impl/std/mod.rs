@@ -49,7 +49,8 @@ pub fn get_ptr() -> Option<*mut u8> {
     }
 }
 
-fn tls_slot() -> *const Cell<*mut u8> {
+#[allow(missing_docs)]
+pub fn tls_slot() -> *const Cell<*mut u8> {
     CURRENT_TASK.with(|c| c as *const _)
 }
 
