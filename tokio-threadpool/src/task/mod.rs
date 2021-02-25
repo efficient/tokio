@@ -321,11 +321,22 @@ fn make_preemptible(future: BoxFuture) -> BoxFuture {
 
 #[cfg(feature = "preemptive")]
 fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
+    use futures::task::tls_slot;
     use futures_util::try_future::TryFutureExt;
-    use inger::future::poll_fn;
+    use inger::future::poll_fns;
     use std::task::Poll;
 
-    let future = poll_fn(
+    fn setup() -> impl Fn() {
+        let slot: usize = unsafe {
+                (*tls_slot()).get()
+        } as _;
+        move || unsafe {
+                (*tls_slot()).replace(slot as _);
+        }
+    }
+
+    let future = poll_fns(
+        setup,
         move ||
             future.poll().map(|async|
                 if let Async::Ready(async) = async {
