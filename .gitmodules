@@ -2,6 +2,10 @@
 	path = tokio
 	url = ../tokio
 	branch = tokio-threadpool-preemptive
+[submodule "futures"]
+	path = futures
+	url = ../tokio
+	branch = futures-0.1-tls
 [submodule "inger"]
 	path = inger
 	url = ../libinger
