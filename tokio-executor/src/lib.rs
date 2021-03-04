@@ -64,5 +64,5 @@ mod typed;
 pub use enter::{enter, exit, Enter, EnterError};
 pub use error::SpawnError;
 pub use executor::Executor;
-pub use global::{spawn, with_default, DefaultExecutor};
+pub use global::{spawn, with_default, with_default_dyn, DefaultExecutor};
 pub use typed::TypedExecutor;

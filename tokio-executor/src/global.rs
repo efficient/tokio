@@ -184,6 +184,25 @@ where
     T: Executor,
     F: FnOnce(&mut Enter) -> R,
 {
+        // While scary, this is safe. The function takes a
+        // `&mut Executor`, which guarantees that the reference lives for the
+        // duration of `with_default`.
+        //
+        // Because we are always clearing the TLS value at the end of the
+        // function, we can cast the reference to 'static which thread-local
+        // cells require.
+        let executor = unsafe {
+                hide_lt(executor as &mut _ as *mut _)
+        };
+        with_default_dyn(executor, enter, f)
+}
+
+#[doc(hidden)]
+pub fn with_default_dyn<F: FnOnce(&mut Enter) -> R, R>(
+        executor: *mut (dyn Executor + 'static),
+        enter: &mut Enter,
+        f: F,
+) -> R {
     EXECUTOR.with(|cell| {
         match cell.get() {
             State::Ready(_) | State::Active => {
@@ -203,16 +222,6 @@ where
         }
 
         let _reset = Reset(cell);
-
-        // While scary, this is safe. The function takes a
-        // `&mut Executor`, which guarantees that the reference lives for the
-        // duration of `with_default`.
-        //
-        // Because we are always clearing the TLS value at the end of the
-        // function, we can cast the reference to 'static which thread-local
-        // cells require.
-        let executor = unsafe { hide_lt(executor as &mut _ as *mut _) };
-
         cell.set(State::Ready(executor));
 
         f(enter)
