@@ -324,33 +324,66 @@ fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
     use futures::task::tls_slot;
     use futures_util::try_future::TryFutureExt;
     use inger::future::poll_fns;
+    use self::imp::Sender;
+    use std::sync::mpsc::sync_channel;
     use std::task::Poll;
+    use tokio_executor::DefaultExecutor;
+    use tokio_executor::enter;
+    use tokio_executor::with_default_dyn;
 
-    fn setup() -> impl Fn() {
-        let slot: usize = unsafe {
-                (*tls_slot()).get()
-        } as _;
-        move || unsafe {
-                (*tls_slot()).replace(slot as _);
-        }
-    }
-
+    let (sender, recver) = sync_channel(1);
     let future = poll_fns(
-        setup,
+        move || {
+            let exec = DefaultExecutor::current_raw().unwrap();
+            sender.send(Sender::from(exec)).unwrap();
+
+            let slot: usize = unsafe {
+                    (*tls_slot()).get()
+            } as _;
+            move || unsafe {
+                    (*tls_slot()).replace(slot as _);
+            }
+        },
         move ||
-            future.poll().map(|async|
-                if let Async::Ready(async) = async {
-                    Poll::Ready(Ok(async))
-                } else {
-                    Poll::Pending
-                }
-            ).unwrap_or_else(|or| {
-                error!("BoxFuture::poll()");
-                Poll::Ready(Err(or))
-            }),
+            with_default_dyn(
+                unsafe {
+                    recver.recv().unwrap().into_inner()
+                },
+                &mut enter().unwrap(),
+                |_| future.poll().map(|async|
+                    if let Async::Ready(async) = async {
+                        Poll::Ready(Ok(async))
+                    } else {
+                        Poll::Pending
+                    }
+                ).unwrap_or_else(|or| {
+                    error!("BoxFuture::poll()");
+                    Poll::Ready(Err(or))
+                }),
+            ),
         TIME_LIMIT,
     ).expect("poll_fn() [launch()]");
     Box::new(future.compat().map(drop).map_err(|or|
         error!("PreemptiveFuture::poll() [resume()]: {}", or)
     ))
+}
+
+#[cfg(feature = "preemptive")]
+mod imp {
+    pub struct Sender<T> (T);
+
+    impl<T> From<T> for Sender<T> {
+        fn from(t: T) -> Self {
+            Self (t)
+        }
+    }
+
+    impl<T> Sender<T> {
+        pub unsafe fn into_inner(self) -> T {
+            let Self (this) = self;
+            this
+        }
+    }
+
+    unsafe impl<T> Send for Sender<T> {}
 }
