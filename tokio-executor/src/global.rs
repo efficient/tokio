@@ -36,6 +36,15 @@ impl DefaultExecutor {
         DefaultExecutor { _dummy: () }
     }
 
+    #[doc(hidden)]
+    pub fn current_raw() -> Option<*mut dyn Executor> {
+        EXECUTOR.with(|executor| if let State::Ready(executor) = executor.get() {
+                Some(executor)
+        } else {
+                None
+        })
+    }
+
     #[inline]
     fn with_current<F: FnOnce(&mut dyn Executor) -> R, R>(f: F) -> Option<R> {
         EXECUTOR.with(
