@@ -4,6 +4,7 @@ version = "0.0.0"
 edition = "2018"
 
 [features]
+notls = ["tokio-threadpool/notls"]
 preemptive = ["tokio-threadpool/preemptive"]
 
 [dependencies]
