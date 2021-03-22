@@ -20,3 +20,12 @@ members = [
   "tokio-udp",
   "tokio-uds",
 ]
+
+[patch.crates-io.futures]
+path = "../futures"
+
+[patch.crates-io.tokio-executor]
+path = "tokio-executor"
+
+[patch.crates-io.tokio-threadpool]
+path = "tokio-threadpool"
