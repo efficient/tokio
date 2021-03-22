@@ -21,6 +21,7 @@ keywords = ["futures", "tokio"]
 categories = ["concurrency", "asynchronous"]
 
 [features]
+notls = ["inger/notls"]
 preemptive = ["futures-util-preview", "inger"]
 
 [dependencies]

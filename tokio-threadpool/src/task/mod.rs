@@ -313,13 +313,43 @@ impl fmt::Debug for Task {
     }
 }
 
-#[cfg(not(feature = "preemptive"))]
+#[cfg(all(not(feature = "preemptive"), not(feature = "notls")))]
 #[inline]
 fn make_preemptible(future: BoxFuture) -> BoxFuture {
     future
 }
 
-#[cfg(feature = "preemptive")]
+#[cfg(all(not(feature = "preemptive"), feature = "notls"))]
+fn make_preemptible(future: BoxFuture) -> BoxFuture {
+    compile_error!("The 'notls' feature only makes sense in concert with 'preemptive'!")
+}
+
+#[cfg(all(feature = "preemptive", feature = "notls"))]
+fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
+    use futures_util::try_future::TryFutureExt;
+    use inger::future::poll_fn;
+    use std::task::Poll;
+
+    let future = poll_fn(
+        move ||
+            future.poll().map(|async|
+                if let Async::Ready(async) = async {
+                    Poll::Ready(Ok(async))
+                } else {
+                    Poll::Pending
+                }
+            ).unwrap_or_else(|or| {
+                error!("BoxFuture::poll()");
+                Poll::Ready(Err(or))
+            }),
+        TIME_LIMIT,
+    ).expect("poll_fn() [launch()]");
+    Box::new(future.compat().map(drop).map_err(|or|
+        error!("PreemptiveFuture::poll() [resume()]: {}", or)
+    ))
+}
+
+#[cfg(all(feature = "preemptive", not(feature = "notls")))]
 fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
     use futures::task::tls_slot;
     use futures_util::try_future::TryFutureExt;
@@ -368,7 +398,7 @@ fn make_preemptible(mut future: BoxFuture) -> BoxFuture {
     ))
 }
 
-#[cfg(feature = "preemptive")]
+#[cfg(all(feature = "preemptive", not(feature = "notls")))]
 mod imp {
     pub struct Sender<T> (T);
 
