@@ -152,6 +152,7 @@ impl Inner {
 
     /// Notify the reactor thread to shutdown once the reactor transitions to an
     /// idle state.
+    #[allow(deprecated)]
     fn shutdown_on_idle(&self) {
         self.shared
             .shutdown
@@ -160,6 +161,7 @@ impl Inner {
     }
 
     /// Notify the reactor thread to shutdown immediately.
+    #[allow(deprecated)]
     fn shutdown_now(&self) {
         let mut curr = self.shared.shutdown.load(SeqCst);
 

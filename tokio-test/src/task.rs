@@ -109,6 +109,7 @@ impl ThreadNotify {
 }
 
 impl Notify for ThreadNotify {
+    #[allow(deprecated)]
     fn notify(&self, _unpark_id: usize) {
         // First, try transitioning from IDLE -> NOTIFY, this does not require a
         // lock.

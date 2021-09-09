@@ -970,6 +970,7 @@ impl fmt::Debug for FrameTooBig {
 }
 
 impl fmt::Display for FrameTooBig {
+    #[allow(deprecated)]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(self.description())
     }

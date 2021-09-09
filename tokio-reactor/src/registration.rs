@@ -183,6 +183,7 @@ impl Registration {
         self.register2(io, || Ok(handle.clone()))
     }
 
+    #[allow(deprecated)]
     fn register2<T, F>(&self, io: &T, f: F) -> io::Result<bool>
     where
         T: Evented,
@@ -356,6 +357,7 @@ impl Registration {
         self.poll_ready(Direction::Write, Notify::No)
     }
 
+    #[allow(deprecated)]
     fn poll_ready(&self, direction: Direction, notify: Notify) -> io::Result<Option<mio::Ready>> {
         let mut state = self.state.load(SeqCst);
 

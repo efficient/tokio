@@ -11,6 +11,7 @@
 //! [transports]: #
 
 #![deny(missing_docs, missing_debug_implementations, warnings)]
+#![allow(invalid_doc_attributes)]
 #![doc(hidden, html_root_url = "https://docs.rs/tokio-codec/0.1.0")]
 
 // _tokio_codec are the items that belong in the `tokio_codec` crate. However, because we need to

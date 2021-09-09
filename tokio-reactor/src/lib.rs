@@ -773,6 +773,7 @@ mod platform {
 // ===== impl SetFallbackError =====
 
 impl fmt::Display for SetFallbackError {
+    #[allow(deprecated)]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.description())
     }

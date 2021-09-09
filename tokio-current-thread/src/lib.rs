@@ -109,6 +109,7 @@ pub struct RunError {
 }
 
 impl fmt::Display for RunError {
+    #[allow(deprecated)]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.description())
     }
@@ -127,6 +128,7 @@ pub struct RunTimeoutError {
 }
 
 impl fmt::Display for RunTimeoutError {
+    #[allow(deprecated)]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.description())
     }
@@ -149,6 +151,7 @@ pub struct TurnError {
 }
 
 impl fmt::Display for TurnError {
+    #[allow(deprecated)]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.description())
     }

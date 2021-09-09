@@ -50,6 +50,7 @@ impl<P: AsRef<Path> + Send + 'static> Future for ReadFile<P> {
     type Item = Vec<u8>;
     type Error = io::Error;
 
+    #[allow(unused_must_use)]
     fn poll(&mut self) -> Poll<Self::Item, Self::Error> {
         let new_state = match &mut self.state {
             State::Open(ref mut open_file) => {

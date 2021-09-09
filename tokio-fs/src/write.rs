@@ -52,6 +52,7 @@ impl<P: AsRef<Path> + Send + 'static, C: AsRef<[u8]> + fmt::Debug> Future for Wr
     type Item = C;
     type Error = io::Error;
 
+    #[allow(unused_must_use)]
     fn poll(&mut self) -> Poll<Self::Item, Self::Error> {
         let new_state = match &mut self.state {
             State::Create(ref mut create_file, contents) => {

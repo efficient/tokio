@@ -98,6 +98,7 @@ impl fmt::Display for RunError {
 }
 
 impl Error for RunError {
+    #[allow(deprecated)]
     fn description(&self) -> &str {
         self.inner.description()
     }

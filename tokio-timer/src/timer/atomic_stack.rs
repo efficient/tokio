@@ -94,6 +94,7 @@ impl AtomicStack {
 impl Iterator for AtomicStackEntries {
     type Item = Arc<Entry>;
 
+    #[allow(unused_parens)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.ptr.is_null() {
             return None;

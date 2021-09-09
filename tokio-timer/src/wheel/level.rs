@@ -38,6 +38,7 @@ pub(crate) struct Expiration {
 const LEVEL_MULT: usize = 64;
 
 impl<T: Stack> Level<T> {
+    #[allow(redundant_semicolons)]
     pub fn new(level: usize) -> Level<T> {
         // Rust's derived implementations for arrays require that the value
         // contained by the array be `Copy`. So, here we have to manually
@@ -216,6 +217,7 @@ impl<T> fmt::Debug for Level<T> {
     }
 }
 
+#[allow(unused_parens)]
 fn occupied_bit(slot: usize) -> u64 {
     (1 << slot)
 }
