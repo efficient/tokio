@@ -37,6 +37,7 @@ impl SpawnError {
     }
 }
 
+#[allow(deprecated)]
 impl fmt::Display for SpawnError {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.description())

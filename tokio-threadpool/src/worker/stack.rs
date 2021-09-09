@@ -38,6 +38,7 @@ pub struct State(usize);
 /// Extracts the head of the worker stack from the scheduler state
 ///
 /// The 16 relates to the value of MAX_WORKERS
+#[allow(unused_parens)]
 const STACK_MASK: usize = ((1 << 16) - 1);
 
 /// Used to mark the stack as empty

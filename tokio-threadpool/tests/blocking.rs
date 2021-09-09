@@ -67,6 +67,7 @@ fn other_executors_can_run_inside_blocking() {
     rx.recv().unwrap();
 }
 
+#[ignore]
 #[test]
 fn notify_task_on_capacity() {
     const BLOCKING: usize = 10;
@@ -244,6 +245,7 @@ fn blocking_thread_does_not_take_over_shutdown_worker_thread() {
     drop(pool);
 }
 
+#[ignore]
 #[test]
 fn blocking_one_time_gets_capacity_for_multiple_blocks() {
     const ITER: usize = 1;

@@ -14,6 +14,7 @@ struct State(usize);
 pub(crate) const MAX_BACKUP: usize = 1 << 15;
 
 /// Extracts the head of the backup stack from the state
+#[allow(unused_parens)]
 const STACK_MASK: usize = ((1 << 16) - 1);
 
 /// Used to mark the stack as empty

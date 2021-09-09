@@ -21,6 +21,7 @@ pub struct EnterError {
     _a: (),
 }
 
+#[allow(deprecated)]
 impl fmt::Debug for EnterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("EnterError")
@@ -29,6 +30,7 @@ impl fmt::Debug for EnterError {
     }
 }
 
+#[allow(deprecated)]
 impl fmt::Display for EnterError {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         write!(fmt, "{}", self.description())
